@@ -12,7 +12,7 @@ import SwiftData
 struct WingingItApp: App {
     @StateObject private var templateDataManager = TemplateDataManager()
     @StateObject private var fingerRoulette = FingerRoulette()
-    @StateObject private var numDrawCenter = NumberDrawCenter()
+    @State private var numDrawCenter = NumberDrawCenter()
     
     var body: some Scene {
         WindowGroup {
@@ -22,8 +22,7 @@ struct WingingItApp: App {
             }
             .environmentObject(templateDataManager)
             .environmentObject(fingerRoulette)
-            .environmentObject(numDrawCenter)
-//            .modelContainer(for: [RangeNumber.self])
+            .environment(numDrawCenter)
         }
     }
 }

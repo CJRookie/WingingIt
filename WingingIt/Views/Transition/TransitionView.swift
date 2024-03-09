@@ -11,12 +11,12 @@ struct TransitionView: View {
     @State private var isLoading = false
     
     var body: some View {
-        HStack {
-            Text("Winging")
+        HStack(spacing: 0) {
+            Text("Choice")
             ZStack {
-                Text("It")
+                Text("Pal")
                     .scaleEffect(isLoading ? 0 : 1)
-                    .rotationEffect(.degrees(isLoading ? -360 : 0))
+                    .rotationEffect(.degrees(isLoading ? -540 : 0))
                 VStack(spacing: 8) {
                     AnimatableStar(isLoading: isLoading, fontSize: 20, rotationDegree: -30, xOffset: -8, delay: 1.5)
                     AnimatableStar(isLoading: isLoading, fontSize: 16, delay: 1)
@@ -24,7 +24,6 @@ struct TransitionView: View {
                 }
             }
         }
-        .offset(x: 1.5)
         .animation(.easeInOut(duration: 1), value: isLoading)
         .font(.system(size: 36, weight: .bold))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)

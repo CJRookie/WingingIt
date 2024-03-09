@@ -25,11 +25,13 @@ struct TemplateEditor: View {
     }
     
     var body: some View {
-        VStack {
+        ZStack {
             Form {
                 questionSection
                 optionSection
             }
+            .autocorrectionDisabled(true)
+            errorPrompt
         }
         .navigationTitle(mode == .adding ? "Create a New Template" : "Edit Template")
         .navigationBarTitleDisplayMode(.inline)
@@ -38,16 +40,27 @@ struct TemplateEditor: View {
             NavigationStack { MultipleOptionsEditor(template: $template) }
         }
         .sheet(isPresented: $showCancellationAlert) {
-            CancellationAlert(showCancellationAlert: $showCancellationAlert, save: save, dismiss: dismiss)
+            CancellationAlert(showCancellationAlert: $showCancellationAlert, save: save) { dismiss() }
         }
-        .onChange(of: template) { _, _ in
+        .onChange(of: template) {
             isChanged = true
+        }
+    }
+    
+    @ViewBuilder
+    private var errorPrompt: some View {
+        if templateError == .insufficientOptions || templateError == .duplicateOption || templateError == .duplicateQuestion {
+            Text(templateError?.localizedDescription ?? "")
+                .redAlert()
+                .onTapGesture {
+                    templateError = nil
+                }
         }
     }
     
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
+        ToolbarItem(placement: .topBarLeading) {
             Button("Cancel", action: cancel)
         }
         ToolbarItem(placement: .topBarTrailing) {
@@ -108,10 +121,6 @@ struct TemplateEditor: View {
             options
             addNewButton
             addMultipleButton
-            if templateError == .insufficientOptions || templateError == .weightLimitExceeded || templateError == .duplicateOption || templateError == .duplicateQuestion {
-                Text(templateError?.localizedDescription ?? "")
-                    .foregroundStyle(.red)
-            }
         } header: {
             HStack {
                 Text("Options")
@@ -129,7 +138,7 @@ struct TemplateEditor: View {
                           prompt: Text("Enter your option").foregroundStyle(templateError == .emptyOption ? .red : .gray.opacity(0.5))
                 )
                 Divider()
-                TextField("Weight", value: option.weight, format: .number)
+                TextField("Weight", value: option.weight, formatter: weightFormater)
                     .frame(width: 56)
                     .keyboardType(.numberPad)
             }

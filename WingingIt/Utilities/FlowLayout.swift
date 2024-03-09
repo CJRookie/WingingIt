@@ -21,7 +21,12 @@ struct FlowLayout: Layout {
         }
         let maxWidth = min(maxSize.width, (proposedWidth + spacing) / 2)
         let maxHeight = max(maxSize.height, maxWidth / 2)
-        return CGSize(width: max(1, maxWidth), height: maxHeight)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            let maxSize = max(maxWidth, maxHeight)
+            return CGSize(width: maxSize, height: maxSize)
+        } else {
+            return CGSize(width: max(1, maxWidth), height: maxHeight)
+        }
     }
     
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {

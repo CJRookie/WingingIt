@@ -15,7 +15,7 @@ struct CurrentTemplate: View {
         if let optionArray = template.options?.array as? [OptionModel] {
             options = optionArray.map { Option(content: $0.content ?? "", weight: $0.weight) }
         }
-        _template = State(initialValue: Template(question: template.question ?? "", options: options))
+        _template = State(initialValue: Template(question: template.question ?? "", options: options, order: template.order))
     }
     
     var body: some View {

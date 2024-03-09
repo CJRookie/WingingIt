@@ -12,7 +12,6 @@ enum TemplateError: Error, LocalizedError {
     case duplicateQuestion
     case emptyOption
     case insufficientOptions
-    case weightLimitExceeded
     case duplicateOption
     
     var errorDescription: String? {
@@ -25,8 +24,6 @@ enum TemplateError: Error, LocalizedError {
             "Enter your option"
         case .insufficientOptions:
             "Insufficient options provided. At least two options are required."
-        case .weightLimitExceeded:
-            "The weight value can not exceed 100."
         case .duplicateOption:
             "Identical options are not allowed."
         }
@@ -40,20 +37,23 @@ enum MultiOptionsError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidOptionFormat:
-            return "Option format is incorrect. Please follow the input criteria."
+            "Option format is incorrect. Please follow the input criteria."
         case .duplicateOption:
-            return "Identical options are not allowed."
+            "Identical options are not allowed."
         }
     }
 }
 
 enum NumGenError: Error, LocalizedError {
-    case InsufficientCandidatesError
+    case insufficientCandidates
+    case invalidNumberRange
     
     var errorDescription: String? {
         switch self {
-        case .InsufficientCandidatesError:
+        case .insufficientCandidates:
             "One or more patterns are invalid. Please check the range and count of all patterns marked with unique results."
+        case .invalidNumberRange:
+            "Invalid range. Please ensure that the lower bound is less than the upper bound."
         }
     }
 }

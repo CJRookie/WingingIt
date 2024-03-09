@@ -23,7 +23,6 @@ final class SoundPlayer {
             player?.enableRate = true
             player?.rate = 5
             player?.volume = 5
-            player?.prepareToPlay()
         } catch {
             fatalError("Unable to initialize AVAudioPlayer: \(error.localizedDescription)")
         }

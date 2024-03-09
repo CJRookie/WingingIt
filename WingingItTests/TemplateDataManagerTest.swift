@@ -10,20 +10,12 @@ import XCTest
 
 final class TemplateDataManagerTest: XCTestCase {
     var dataManager: TemplateDataManager!
-    var count: Int = 0
     
     override func setUpWithError() throws {
         dataManager = TemplateDataManager()
-        count = dataManager.templates.count
-        print("setting up \(dataManager.templates.count), tracking count \(count)")
     }
     
     override func tearDownWithError() throws {
-        print(dataManager.templates.count, count)
-        if dataManager.templates.count > count {
-            dataManager.delete(at: IndexSet(integersIn: 2..<dataManager.templates.count))
-        }
-        print("tearing down \(dataManager.templates.count), tracking count \(count)")
         dataManager = nil
     }
     
@@ -56,12 +48,6 @@ final class TemplateDataManagerTest: XCTestCase {
             XCTAssertEqual(error as? TemplateError, TemplateError.duplicateOption, "Error thrown should be TemplateError.duplicateOption")
         }
         
-        // test weight limit exceeded
-        let weightLimitExceededTemplate = Template(question: "Question", options: [Option(content: "Option 1", weight: 101), Option(content: "Option 2", weight: 50)])
-        XCTAssertThrowsError(try dataManager.validate(weightLimitExceededTemplate), "Weight limit exceeded should throw an error") { error in
-            XCTAssertEqual(error as? TemplateError, TemplateError.weightLimitExceeded, "Error thrown should be TemplateError.weightLimitExceeded")
-        }
-        
         // test insufficient options
         let insufficientOptionsTemplate = Template(question: "Question", options: [Option(content: "Option 1", weight: 50)])
         XCTAssertThrowsError(try dataManager.validate(insufficientOptionsTemplate), "Insufficient options should throw an error") { error in
@@ -91,8 +77,13 @@ final class TemplateDataManagerTest: XCTestCase {
         XCTAssertEqual(dataManager.selectedTemplate?.id, dataManager.templates[0].id)
         
         // moving template position
-        let templates = dataManager.templates
-        dataManager.move(from: IndexSet(integer: 0), to: dataManager.templates.count)
-        XCTAssertNotEqual(dataManager.templates, templates)
+        dataManager.add(Template(question: "Moving template1", options: [Option(content: "option 1"), Option(content: "option 2")]))
+        dataManager.add(Template(question: "Moving template2", options: [Option(content: "option 1"), Option(content: "option 2")]))
+        XCTAssertTrue(dataManager.templates.count == 3)
+        dataManager.move(from: IndexSet(integer: 0), to: 1)
+        for index in 0..<dataManager.templates.count {
+            XCTAssertEqual(index, Int(dataManager.templates[index].order))
+        }
+        print(dataManager.templates)
     }
 }

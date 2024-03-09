@@ -13,10 +13,13 @@ struct CapsuleTab: View {
     @State private var showNewTemplate = false
     @State private var showCurrentTemplate = false
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
+    private var isOniPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
     
     var body: some View {
         Group {
-            if UIDevice.current.userInterfaceIdiom == .pad {
+            if isOniPad {
                 NavigationSplitView(columnVisibility: $columnVisibility) {
                     TemplateHistory()
                 } detail: {
@@ -72,7 +75,10 @@ struct CapsuleTab: View {
     private var buttonLayout: some View {
         Group {
             if verticalSizeClass == .regular {
-                portraitLayout
+                ViewThatFits {
+                    portraitLayout
+                    landscapeLayout
+                }
             } else {
                 landscapeLayout
             }
@@ -104,18 +110,18 @@ struct CapsuleTab: View {
     
     private var question: some View {
         Text(verticalSizeClass == .regular ? templateDataManager.selectedTemplate?.question ?? "" : "")
-            .fontWeight(.semibold)
+            .font(.system(size: isOniPad ? 24 : 16, weight: .semibold))
     }
     
     private var selectedOption: some View {
         Text(templateDataManager.selectedOption?.content ?? " ")
-            .font(.title)
+            .font(.system(size: isOniPad ? 32 : 24, weight: .semibold))
             .lineLimit(1, reservesSpace: true)
             .padding(.vertical)
     }
     
     private var availableOptions: some View {
-        FlowLayout(spacing: 18) {
+        FlowLayout(spacing: isOniPad ? 24 : 16) {
             ForEach(templateDataManager.selectedTemplate?.options?.array as? [OptionModel] ?? []) { option in
                 CapsuleText(theme: option.theme, text: option.content ?? "")
                     .shadowHighlight(isSelected: option == templateDataManager.selectedOption, shadowColor: option.theme.mainColor, animationDuration: templateDataManager.timeInterval)

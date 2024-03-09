@@ -12,24 +12,16 @@ struct MultipleOptionsEditor: View {
     @Environment(\.dismiss) var dismiss
     @State private var vm = MultiOptionsViewModel()
     @State private var text: String = ""
-    @FocusState private var isFocused: Bool
-    @State private var errorMessage = ""
+    @State private var mOptionError: MultiOptionsError?
     @Binding var template: Template
     
     var body: some View {
-        ZStack(alignment: .top) {
-            VStack {
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
-                }
+        ScrollView(showsIndicators: false) {
+            ZStack(alignment: .top) {
                 TextEditor(text: $text)
-                    .keyboardType(.alphabet)
-                    .autocorrectionDisabled()
-                    .focused($isFocused)
-            }
-            if text.isEmpty {
+                    .autocorrectionDisabled(true)
                 textEditorPrompt
+                errorPrompt
             }
         }
         .navigationTitle("Add Multiple Options")
@@ -38,10 +30,16 @@ struct MultipleOptionsEditor: View {
             toolbarItems
         }
         .padding(.horizontal)
-        .onChange(of: text) { _, newValue in
-            if newValue.isEmpty {
-                errorMessage = ""
-            }
+    }
+    
+    @ViewBuilder
+    private var errorPrompt: some View {
+        if mOptionError != nil {
+            Text(mOptionError?.localizedDescription ?? "")
+                .redAlert()
+                .onTapGesture {
+                    mOptionError = nil
+                }
         }
     }
     
@@ -60,15 +58,18 @@ struct MultipleOptionsEditor: View {
             try vm.addMultiOptions(with: text, to: &template)
             dismiss()
         } catch {
-            errorMessage = error.localizedDescription
+            mOptionError = error as? MultiOptionsError
         }
     }
     
+    @ViewBuilder
     private var textEditorPrompt: some View {
-        Text("Enter your options, with each option on a new line or separated by semicolons. After each option, specify its weight by separating it with a comma. If no specific weight is provided or the weight is invalid, the default assignment is 1.\ne.g.\nBlue\nGreen, 2\nRed, 5\nor\nBlue, 3; Green, 2; Red, 5\nor\nBlue; Green, 1; Red, 1\nYellow, 5; Blue, 3")
-            .multilineTextAlignment(.leading)
-            .foregroundStyle(.secondary)
-            .padding(EdgeInsets(top: 7, leading: 1, bottom: 0, trailing: 0))
-            .allowsHitTesting(false)
+        if text.isEmpty {
+            Text("Enter your options, with each option on a new line or separated by semicolons. After each option, specify its weight by separating it with a comma. If no specific weight is provided or the weight is invalid, the default assignment is 1.\ne.g.\nBlue\nGreen, 2\nRed, 5\nor\nBlue, 3; Green, 2; Red, 5\nor\nBlue; Green, 1; Red, 1\nYellow, 5; Blue, 3")
+                .allowsHitTesting(false)
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(.secondary)
+                .padding(EdgeInsets(top: 7, leading: 1, bottom: 0, trailing: 0))
+        }
     }
 }

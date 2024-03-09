@@ -6,33 +6,39 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct NumberTab: View {
-    @EnvironmentObject var numDrawCenter: NumberDrawCenter
+    @Environment(NumberDrawCenter.self) private var numDrawCenter
     @State private var showNumberEditor = false
+    @State private var selectedNumber: [Int?] = []
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 numberCards
             }
             .safeAreaInset(edge: .bottom) { buttonLayout }
         }
         .sheet(isPresented: $showNumberEditor) { 
             NavigationStack {
-                NumberEditorView()
+                NumberEditor()
             }
         }
-        .onDisappear { numDrawCenter.spinReset() }
+        .onDisappear {
+            numDrawCenter.spinReset()
+        }
     }
     
     private var numberCards: some View {
-        FlowLayout {
-            ForEach(numDrawCenter.selectedNumArray.indices, id: \.hashValue) { index in
-                NumberCard(selectedNumber: numDrawCenter.selectedNumArray[index])
+        FlowLayout(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 8 : 0) {
+            ForEach(numDrawCenter.selectedNumberArray.indices, id: \.hashValue) { index in
+                if numDrawCenter.selectedNumberArray.indices.contains(index) {
+                    NumberCard(selectedNumber: numDrawCenter.selectedNumberArray[index])
+                } 
             }
         }
-        .padding(.vertical)
+        .padding()
     }
     
     private var buttonLayout: some View {
@@ -53,17 +59,10 @@ struct NumberTab: View {
     
     private var editButton: some View {
         Button {
+            numDrawCenter.initSetup()
             showNumberEditor.toggle()
         } label: {
             Image(systemName: "square.and.pencil")
         }
-    }
-}
-
-struct NumberTabView: View {
-    @Environment(\.modelContext) private var context
-    
-    var body: some View {
-        Text("Hello")
     }
 }

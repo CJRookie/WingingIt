@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeTab: View {
-    @State private var selection: Tab = .number
+    @State private var selection: Tab = .capsule
     
     enum Tab: String {
         case capsule

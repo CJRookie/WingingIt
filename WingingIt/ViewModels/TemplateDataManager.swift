@@ -44,13 +44,16 @@ class TemplateDataManager: ObservableObject {
     private func addDefaultTemplate() {
         let template = Template(
             question: "Pick a color",
-            options: ColorTheme.allCases.map { Option(content: $0.rawValue) }
+            options: ColorTheme.allCases.map { Option(content: $0.rawValue) },
+            order: 0
         )
         add(template)
     }
     
     private func fetchTemplates() {
         let request = TemplateModel.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "order", ascending: true)
+        request.sortDescriptors = [sortDescriptor]
         do {
             templates = try context.fetch(request)
         } catch {
@@ -70,6 +73,7 @@ class TemplateDataManager: ObservableObject {
     func add(_ template: Template) {
         let templateModel = TemplateModel(context: context)
         templateModel.creationDate = .now
+        templateModel.order = template.order
         update(templateModel, with: template)
     }
     
@@ -97,12 +101,15 @@ class TemplateDataManager: ObservableObject {
     
     func move(from source: IndexSet, to destination: Int) {
         templates.move(fromOffsets: source, toOffset: destination)
+        for (index, template) in templates.enumerated() {
+            template.order = Int16(index)
+        }
         dataCenter.save()
     }
     
     private func update(_ templateModel: TemplateModel, with template: Template) {
         colorThemeProvider.allColorThemes = ColorTheme.allCases.shuffled()
-        templateModel.question = template.question
+        templateModel.question = template.question.capitalizeFirstLetter()
         templateModel.id = template.id
         let optionSet = convertToOptionModelSet(from: template.options)
         templateModel.addToOptions(optionSet)
@@ -132,20 +139,17 @@ class TemplateDataManager: ObservableObject {
             updateSelectedTemplate(with: id)
             throw TemplateError.duplicateQuestion
         }
+        var uniqueContentSet = Set<String>()
         for option in template.options {
             if option.content.isEmpty {
                 throw TemplateError.emptyOption
             }
-            if option.weight > 100 {
-                throw TemplateError.weightLimitExceeded
+            if !uniqueContentSet.insert(option.content).inserted {
+                throw TemplateError.duplicateOption
             }
         }
         if template.options.count < 2 {
             throw TemplateError.insufficientOptions
-        }
-        let optionSet = Set(template.options)
-        if template.options.count != optionSet.count {
-            throw TemplateError.duplicateOption
         }
         return true
     }

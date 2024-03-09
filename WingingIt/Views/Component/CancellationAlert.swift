@@ -10,15 +10,16 @@ import SwiftUI
 struct CancellationAlert: View {
     @Binding var showCancellationAlert: Bool
     var save: () -> Void
-    var dismiss: DismissAction
+    var discard: () -> Void
     
     var body: some View {
         VStack {
+            Spacer()
             VStack(spacing: 0) {
                 Button("Save Changes", action: save)
                     .padding(.bottom)
                 Divider()
-                Button("Discard Changes") { dismiss() }
+                Button("Discard Changes", action: discard)
                     .padding(.top)
                     .foregroundStyle(.red)
             }
@@ -30,7 +31,6 @@ struct CancellationAlert: View {
                     .maxWidthStrokeBorder()
             }
         }
-        .presentationDetents([.height(180)])
         .presentationBackground(.clear)
     }
 }

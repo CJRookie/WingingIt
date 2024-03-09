@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TemplateRow: View {
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var templateDataManager: TemplateDataManager
     var isSelected: Bool
     var template: TemplateModel
@@ -18,6 +19,7 @@ struct TemplateRow: View {
         HStack(spacing: 2) {
             Button(template.question ?? "") {
                 templateDataManager.updateSelectedTemplate(with: template.id ?? "")
+                dismiss()
             }
             .padding(.leading)
             .frame(maxWidth: .infinity, maxHeight: height, alignment: .leading)

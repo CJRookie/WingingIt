@@ -9,9 +9,7 @@ import Foundation
 import SwiftUI
 
 struct Option: Identifiable, Equatable, Hashable {
-    var id: String {
-        content.trimmingCharacters(in: .whitespaces)
-    }
+    var id = UUID()
     var content: String
     var weight: Int16
     
