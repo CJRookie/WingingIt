@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 class RangeNumberDataCenter {
-    static let share = RangeNumberDataCenter()
+    static let shared = RangeNumberDataCenter()
     private let container: ModelContainer
     let context: ModelContext
     

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Observable class NumberDrawCenter {
-    private let rangeNumberDataCenter = RangeNumberDataCenter.share
+    private let rangeNumberDataCenter = RangeNumberDataCenter.shared
     private let context: ModelContext
     private(set) var rangeNumberList: [RangeNumber] = []
     private var rangeNumberRefList: [RangeNumber] = []
